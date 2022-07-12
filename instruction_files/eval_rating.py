@@ -82,8 +82,8 @@ class Generator(GeneratorBasic):
             print(split)
             for dp in tqdm(datapoints):
                 eval_dataset_name  = dp['dataset_name']
-                if (split=='train' or split=='all') and eval_dataset_name not in ['humod']:
-                    continue
+                # if (split=='train' or split=='all') and eval_dataset_name not in ['humod']:
+                #     continue
 
                 text = ''
                 

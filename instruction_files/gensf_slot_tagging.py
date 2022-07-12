@@ -168,7 +168,7 @@ class Generator(GeneratorBasic):
             print(dataset_reader.name, len(sequences))
 
         print(sequences[-1])
-        import pdb;pdb.set_trace()
+        #import pdb;pdb.set_trace()
 
         return (sequences, instruction_dict)
 

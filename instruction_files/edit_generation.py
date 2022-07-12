@@ -18,6 +18,11 @@ random.seed(123)
 
 import random
 import nltk
+
+nltk.download('punkt')
+nltk.download('omw-1.4')
+nltk.download('averaged_perceptron_tagger')
+
 from nltk.tokenize import sent_tokenize
 from checklist.perturb import Perturb
 import re
@@ -41,7 +46,12 @@ instruction_dict = {
 
 class TransformResponses:
     def __init__(self):
-        self.nlp = spacy.load("en_core_web_sm")
+        try:
+            self.nlp = spacy.load("en_core_web_sm")
+        except:
+            import subprocess
+            subprocess.call('python -m spacy download en_core_web_sm', shell=True)
+            self.nlp = spacy.load("en_core_web_sm")
         self.stopwords = self.nlp.Defaults.stop_words
         
     def remove_punct(self, sent):

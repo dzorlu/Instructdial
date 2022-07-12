@@ -15,6 +15,8 @@ from typing import Dict, List
 from tqdm import tqdm
 from tqdm import trange
 
+
+
 import settings
 from constants import SPECIAL_TOKENS
 from datareaders import get_reader
@@ -111,7 +113,7 @@ def sample_fewshot(data: Dict, k_shot: int, data_dist='uniform') -> List:
     return samples
 
 
-def add_nota_random_option_toinstance(datapoint, task2labels):
+def add_nota_random_option_toinstance(args, datapoint, task2labels):
     inputtext = datapoint['input']
     try:
         texts = inputtext.split(settings.OPTION_TOKEN)
@@ -242,6 +244,8 @@ def encodeinstruction(args, task,
 
     input_instructionformat=''
     definitions = data['Definitions']
+    print(f"task: {task}")
+    print(f"definitions: {definitions}")
 
     #gather dataset specific definitions
     dataset_specific_definitions = dict()
@@ -350,7 +354,7 @@ def encodeinstruction(args, task,
         if task2labels and datapoint['task'] not in ['eval_binary', 'eval_ranking'] and args.no_instr is False:
             #current options
             dpdatapoint = copy.deepcopy(datapoint)
-            dpdatapoint = add_nota_random_option_toinstance(dpdatapoint, task2labels)
+            dpdatapoint = add_nota_random_option_toinstance(args, dpdatapoint, task2labels)
             if dpdatapoint is not None:
                 dpdatapoint['prompt'] = input_instructionformat+'Input: '+ dpdatapoint['input']
                 datalist.append(dpdatapoint)
@@ -577,8 +581,10 @@ def encode_tasks(args):
 
         # create a common metadata dictionary that should be present in all tasks data
         max_text_size = -1
+        print(f"datapoint length: {len(data['Instances'])}")
         for i in range(len(data['Instances'])):
             datapoint = data['Instances'][i]
+            
             metadata_dp = datapoint.get('metadata')
             if 'input' not in datapoint:
                 datapoint['input'] = datapoint['text'] 
@@ -611,9 +617,14 @@ def encode_tasks(args):
         #select data for instruction_binary task
         if args.instruction_binary_size!=-1:
             instruction_binary_sampledata = random.sample(datalist, min(len(datalist),args.instruction_binary_size))
-            
-        all_data+=datalist
-        print(task, " with number of datapoints:", len(datalist))
+        
+        if not datalist:
+            print(f"data is empty for task : {task}")
+        else:
+            all_data+=datalist
+            print(task, " with number of datapoints:", len(datalist))
+            print(f"sample: {datalist[0]}")
+            print("*"*10)
 
     if few_shot_tasks:
         for task, few_shot_config in few_shot_tasks.items():
